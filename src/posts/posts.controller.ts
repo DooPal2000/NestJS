@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -18,7 +18,7 @@ interface PostModel {
   commentCount: number;
 }
 
-let posts : PostModel[] = [
+let posts: PostModel[] = [
   {
     id: 1,
     author: 'against_the_current',
@@ -50,17 +50,41 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) { }
 
   @Get()
-  getPosts(){
+  getPosts() {
     return posts;
   }
-  
+
   // 
   @Get(':id')
-  getPost(@Param('id') id: string){ // 파람 데코레이터에 파라미터 이름이 id이다. 
-    return posts.find((post)=> post.id == +id); // +함으로써 숫자 전환
+  getPost(@Param('id') id: string) { // 파람 데코레이터에 파라미터 이름이 id이다. 
+    const post = posts.find((post) => post.id == +id); // +함으로써 숫자 전환
+
+    if (!post) {
+      throw new NotFoundException();
+    }
+
+    return post;
   }
 
+  @Post()
+  postPosts(
+    @Body('author') author: string,
+    @Body('title') title: string,
+    @Body('content') content: string,
+  ) {
+    const post = {
+      id: posts[posts.length - 1].id + 1,
+      author,
+      title,
+      content,
+      likeCount: 0,
+      commentCount: 0
+    };
 
-
-
+    posts = [
+      ...posts,
+      post,
+    ]
+    return post;
+  }
 }
