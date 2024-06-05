@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -9,7 +9,8 @@ import { PostsService } from './posts.service';
 * commentCount: number;
 */
 
-interface Post {
+interface PostModel {
+  id: number;
   author: string;
   title: string;
   content: string;
@@ -17,20 +18,49 @@ interface Post {
   commentCount: number;
 }
 
+let posts : PostModel[] = [
+  {
+    id: 1,
+    author: 'against_the_current',
+    title: 'atc',
+    content: '공연 준비 중인 atc',
+    likeCount: 10000,
+    commentCount: 99999
+  },
+  {
+    id: 2,
+    author: 'against_the_current',
+    title: 'chrissy',
+    content: '공연 준비 중인 chrissy',
+    likeCount: 10000,
+    commentCount: 99999
+  },
+  {
+    id: 3,
+    author: 'blackpink_official',
+    title: '로제',
+    content: '공연 준비 중인 로제',
+    likeCount: 10000,
+    commentCount: 99999
+  }
+]
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) { }
 
   @Get()
-  getPost(): Post {
-    return{
-      author: 'against_the_current',
-      title: 'About ATC band',
-      content: '공연 일정이 잡힌 ATC',
-      likeCount: 1000000,
-      commentCount: 99999
-    };
+  getPosts(){
+    return posts;
   }
+  
+  // 
+  @Get(':id')
+  getPost(@Param('id') id: string){ // 파람 데코레이터에 파라미터 이름이 id이다. 
+    return posts.find((post)=> post.id == +id); // +함으로써 숫자 전환
+  }
+
+
+
 
 }
