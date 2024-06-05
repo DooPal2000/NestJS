@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -86,5 +86,44 @@ export class PostsController {
       post,
     ]
     return post;
+  }
+
+  @Put(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
+  putPost(
+    @Param('id') id: string,
+    @Body('author') author?: string,
+    @Body('title') title?: string,
+    @Body('content') content?: string,
+  ) {
+    const post = posts.find(post => post.id === +id);
+    if (!post) {
+      throw new NotFoundException();
+    }
+    if (author) {
+      post.author = author;
+    }
+    if (title) {
+      post.title = title;
+    }
+    if (content) {
+      post.content = content;
+    }
+
+    posts = posts.map(prevPost => prevPost.id === +id ? post : prevPost);
+
+    return post;
+  }
+
+  @Delete(':id')
+  deletePost(
+    @Param('id') id: string,
+  ) {
+    const post = posts.find((post) => post.id == +id); // +함으로써 숫자 전환
+    if (!post) {
+      throw new NotFoundException();
+    }
+    posts = posts.filter(post => post.id !== +id);
+
+    return id;
   }
 }
