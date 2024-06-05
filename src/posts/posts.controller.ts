@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -9,41 +9,6 @@ import { PostsService } from './posts.service';
 * commentCount: number;
 */
 
-interface PostModel {
-  id: number;
-  author: string;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-}
-
-let posts: PostModel[] = [
-  {
-    id: 1,
-    author: 'against_the_current',
-    title: 'atc',
-    content: '공연 준비 중인 atc',
-    likeCount: 10000,
-    commentCount: 99999
-  },
-  {
-    id: 2,
-    author: 'against_the_current',
-    title: 'chrissy',
-    content: '공연 준비 중인 chrissy',
-    likeCount: 10000,
-    commentCount: 99999
-  },
-  {
-    id: 3,
-    author: 'blackpink_official',
-    title: '로제',
-    content: '공연 준비 중인 로제',
-    likeCount: 10000,
-    commentCount: 99999
-  }
-]
 
 @Controller('posts')
 export class PostsController {
@@ -51,43 +16,28 @@ export class PostsController {
 
   @Get()
   getPosts() {
-    return posts;
+    return this.postsService.getAllPosts();
   }
 
   // 
   @Get(':id')
   getPost(@Param('id') id: string) { // 파람 데코레이터에 파라미터 이름이 id이다. 
-    const post = posts.find((post) => post.id == +id); // +함으로써 숫자 전환
-
-    if (!post) {
-      throw new NotFoundException();
-    }
-
-    return post;
+    return this.postsService.getPostById(+id);
   }
 
+
+  
   @Post()
   postPosts(
     @Body('author') author: string,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
-    const post = {
-      id: posts[posts.length - 1].id + 1,
-      author,
-      title,
-      content,
-      likeCount: 0,
-      commentCount: 0
-    };
-
-    posts = [
-      ...posts,
-      post,
-    ]
-    return post;
+    return this.postsService.createPost(
+      author,title,content
+    );
   }
-
+  
   @Put(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
   putPost(
     @Param('id') id: string,
@@ -95,35 +45,15 @@ export class PostsController {
     @Body('title') title?: string,
     @Body('content') content?: string,
   ) {
-    const post = posts.find(post => post.id === +id);
-    if (!post) {
-      throw new NotFoundException();
-    }
-    if (author) {
-      post.author = author;
-    }
-    if (title) {
-      post.title = title;
-    }
-    if (content) {
-      post.content = content;
-    }
-
-    posts = posts.map(prevPost => prevPost.id === +id ? post : prevPost);
-
-    return post;
+    return this.postsService.updatePost(
+      +id, author, title, content
+    );
   }
 
   @Delete(':id')
   deletePost(
     @Param('id') id: string,
   ) {
-    const post = posts.find((post) => post.id == +id); // +함으로써 숫자 전환
-    if (!post) {
-      throw new NotFoundException();
+    return this.postsService.deletePost(+id);
     }
-    posts = posts.filter(post => post.id !== +id);
-
-    return id;
-  }
 }
