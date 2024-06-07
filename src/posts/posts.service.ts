@@ -37,7 +37,7 @@ let posts: PostModel[] = [
 ]
 
 
-@Injectable()
+@Injectable() // 이 어노테이션 외에도 module.ts 에도 등록해야 합니다. 2가지가 되어야 DI 완료
 export class PostsService {
     getAllPosts() {
         return posts;
@@ -68,8 +68,8 @@ export class PostsService {
             post,
         ]
         return post;
-
     }
+
     updatePost(postId: number, author: string, title: string, content: string) {
         const post = posts.find(post => post.id === postId);
         if (!post) {
@@ -91,7 +91,7 @@ export class PostsService {
     }
 
     deletePost(postId: number) {
-        const post = posts.find((post) => post.id === postId); 
+        const post = posts.find((post) => post.id === postId);
         if (!post) {
             throw new NotFoundException();
         }
