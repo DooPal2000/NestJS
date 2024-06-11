@@ -46,13 +46,16 @@ export class PostsService {
         @InjectRepository(PostModel)
         private readonly postsRepository: Repository<PostModel>
     ){}
-    getAllPosts() {
-        return posts;
+    async getAllPosts() {
+        return await this.postsRepository.find();
     }
 
-    getPostById(id: number) {
-        const post = posts.find((post) => post.id == +id); // +함으로써 숫자 전환
-
+    async getPostById(id: number) {
+        const post =  await this.postsRepository.findOne({
+            where:{
+                id,
+            },
+        });
         if (!post) {
             throw new NotFoundException();
         }
@@ -61,6 +64,8 @@ export class PostsService {
     }
 
     createPost(author: string, title: string, content: string) {
+        // 1. create -> 저장될 객체를 생성한다
+        // 2. save -> 객체를 저장한다. (create 메서드에서 생성한 객체로)
         const post = {
             id: posts[posts.length - 1].id + 1,
             author,
