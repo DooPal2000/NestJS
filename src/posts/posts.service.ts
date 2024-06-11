@@ -1,13 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PostModel } from './entities/posts.entity';
 
-export interface PostModel {
-    id: number;
-    author: string;
-    title: string;
-    content: string;
-    likeCount: number;
-    commentCount: number;
-}
+// export interface PostModel {
+//     id: number;
+//     author: string;
+//     title: string;
+//     content: string;
+//     likeCount: number;
+//     commentCount: number;
+// }
 
 let posts: PostModel[] = [
     {
@@ -39,6 +42,10 @@ let posts: PostModel[] = [
 
 @Injectable() // 이 어노테이션 외에도 module.ts 에도 등록해야 합니다. 2가지가 되어야 DI 완료
 export class PostsService {
+    constructor(
+        @InjectRepository(PostModel)
+        private readonly postsRepository: Repository<PostModel>
+    ){}
     getAllPosts() {
         return posts;
     }

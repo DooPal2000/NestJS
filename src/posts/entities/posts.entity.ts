@@ -1,10 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class PostModel{
+export class PostModel {
     @PrimaryGeneratedColumn()
     id: number;
-    
+
     @Column()
     author: string;
 
@@ -16,7 +16,7 @@ export class PostModel{
 
     @Column()
     likeCount: number;
-    
+
     @Column()
     commentCount: number;
 }
