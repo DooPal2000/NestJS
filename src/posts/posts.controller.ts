@@ -26,27 +26,26 @@ export class PostsController {
   }
 
 
-  
+
   @Post()
   postPosts(
-    @Body('author') author: string,
+    @Body('authorId') authorId: number,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
     return this.postsService.createPost(
-      author,title,content
+      authorId, title, content
     );
   }
-  
+
   @Put(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
   putPost(
     @Param('id') id: string,
-    @Body('author') author?: string,
     @Body('title') title?: string,
     @Body('content') content?: string,
   ) {
     return this.postsService.updatePost(
-      +id, author, title, content
+      +id, title, content
     );
   }
 
@@ -55,5 +54,5 @@ export class PostsController {
     @Param('id') id: string,
   ) {
     return this.postsService.deletePost(+id);
-    }
+  }
 }
