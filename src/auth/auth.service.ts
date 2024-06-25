@@ -27,11 +27,6 @@ export class AuthService {
      *      2. 비밀번호 맞는지 확인
      *      3. 모두 통과되면 찾은 사용자 정보 반환
      *      4. loginWithEmail 에서 반환된 데이터를 기반으로 토큰 생성
-     */
-
-
-    
-
-    
+     */    
 
 }
