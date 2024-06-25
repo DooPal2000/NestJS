@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -32,6 +32,7 @@ export class PostsController {
     @Body('authorId') authorId: number,
     @Body('title') title: string,
     @Body('content') content: string,
+    @Body('isPublic', new DefaultValuePipe(true)) isPublic: boolean,
   ) {
     return this.postsService.createPost(
       authorId, title, content
