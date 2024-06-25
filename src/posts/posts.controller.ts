@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -21,7 +21,7 @@ export class PostsController {
 
   // 
   @Get(':id')
-  getPost(@Param('id') id: string) { // 파람 데코레이터에 파라미터 이름이 id이다. 
+  getPost(@Param('id', ParseIntPipe) id: number) { // param 데코레이터에 파라미터 이름이 id이다. 
     return this.postsService.getPostById(+id);
   }
 
@@ -40,18 +40,18 @@ export class PostsController {
 
   @Put(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
   putPost(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body('title') title?: string,
     @Body('content') content?: string,
   ) {
     return this.postsService.updatePost(
-      +id, title, content
+      id, title, content
     );
   }
 
   @Delete(':id')
   deletePost(
-    @Param('id') id: string,
+    @Param('id',ParseIntPipe) id: number,
   ) {
     return this.postsService.deletePost(+id);
   }
