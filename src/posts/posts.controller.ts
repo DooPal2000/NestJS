@@ -1,5 +1,6 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Put, UseGuards, Request } from '@nestjs/common';
 import { PostsService } from './posts.service';
+import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 
 /**
 * author :string;
@@ -28,11 +29,13 @@ export class PostsController {
 
 
   @Post()
+  @UseGuards(AccessTokenGuard)
   postPosts(
-    @Body('authorId') authorId: number,
+    @Request() req:any,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
+    const authorId = req.user.id;
     return this.postsService.createPost(
       authorId, title, content
     );
