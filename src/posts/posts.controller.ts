@@ -34,12 +34,12 @@ export class PostsController {
   @UseGuards(AccessTokenGuard)
   postPosts(
     //@Request() req:any,
-    @User() user : UsersModel,
+    @User('id') userId : number,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
     return this.postsService.createPost(
-      user.id, title, content
+      userId, title, content
     );
   }
 
