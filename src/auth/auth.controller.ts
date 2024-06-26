@@ -7,6 +7,18 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
 
+  @Post('login/email')
+  postLoginEmail(
+    @Headers('authorization') rawToken: string,
+  ){
+    // email:password -> base64
+    // cxvjkzxkclvjdifasd -> email:password
+    const token = this.authService.extractTokenFromHeader(rawToken, false);
+
+    const credentials = this.authService.decodeBasicToken(token);
+
+    return this.authService.loginWithEmail(credentials);
+  }
 
   @Post('reigiser/email')
   postRegisterEmail(@Body('nickname') nickname: string,
