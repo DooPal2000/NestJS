@@ -12,7 +12,6 @@ export class AuthController {
   @UseGuards(BasicTokenGuard)
   postLoginEmail(
     @Headers('authorization') rawToken: string,
-    @Request() req,
   ){
     // email:password -> base64
     // cxvjkzxkclvjdifasd -> email:password
