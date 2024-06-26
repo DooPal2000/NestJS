@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { Observable } from "rxjs";
 import { AuthService } from "../auth.service";
 
 /**
@@ -36,5 +35,13 @@ export class BasicTokenGuard implements CanActivate {
         const token = this.authService.extractTokenFromHeader(rawToken, false);
 
         const {email,password} = this.authService.decodeBasicToken(token);
+
+        const user = await this.authService.authenticateWithEmailAndPassword({
+            email,
+            password,
+        });
+
+        req.user = user;
+        return true;
     }
 }
