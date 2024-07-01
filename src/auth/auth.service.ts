@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
+    constructor(
+        private readonly jwtService: JwtService
+    ){}
     /**
      * 
      * 우리가 만드려는 기능
@@ -28,5 +32,16 @@ export class AuthService {
      *      3. 모두 통과되면 찾은 사용자 정보 반환
      *      4. loginWithEmail 에서 반환된 데이터를 기반으로 토큰 생성
      */    
+
+    /**
+     * Payload 에 들어갈 정보
+     * 1) email
+     * 2) sub -> id
+     * 3) type: 'access'| 'refresh'
+     *  
+     */
+    signToken(){
+        
+    }
 
 }
