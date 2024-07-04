@@ -37,6 +37,33 @@ export class AuthService {
      */
 
     /**
+     *  Header로부터 토큰을 받을 때
+     *      예) {authorization: 'Basic {toekn}'}
+     *      예) {authorization: 'Bearer {token}'}
+     */
+
+    async extractTokenFromHeader(header: string, isBearer: boolean) {
+        // 'Basic {token}' 요렇게 들어오는데, split 을 지나면 아래 줄로 변환됩니다.(알고 있는 내용)
+        // [Basic, {token}] 
+        // 'Bearer {token}' 요렇게 들어오는데, split 을 지나면 아래 줄로 변환됩니다.(알고 있는 내용)
+        // [Bearer, {token}]
+
+        const splitToken = header.split(' ');
+
+        const prefix = isBearer ? 'Bearer' : 'Basic';
+
+        if (splitToken.length !== 2 || splitToken[0] !== prefix) {
+            throw new UnauthorizedException('잘못된 토큰입니다.');
+        }
+        
+        const token = splitToken[1];
+
+        return token;
+    }
+
+
+
+    /**
      * 
      * 우리가 만드려는 기능
      * 
