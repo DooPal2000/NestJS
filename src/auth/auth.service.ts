@@ -42,7 +42,7 @@ export class AuthService {
      *      예) {authorization: 'Bearer {token}'}
      */
 
-    async extractTokenFromHeader(header: string, isBearer: boolean) {
+    extractTokenFromHeader(header: string, isBearer: boolean) {
         // 'Basic {token}' 요렇게 들어오는데, split 을 지나면 아래 줄로 변환됩니다.(알고 있는 내용)
         // [Basic, {token}] 
         // 'Bearer {token}' 요렇게 들어오는데, split 을 지나면 아래 줄로 변환됩니다.(알고 있는 내용)
@@ -59,6 +59,49 @@ export class AuthService {
         const token = splitToken[1];
 
         return token;
+    }
+
+    // decode For Base64 encodedToken
+    decodeBasicToken(base64String: string){
+        const decode = Buffer.from(base64String, 'base64').toString('utf8');
+
+        const split = decode.split(':');
+
+        if(split.length !== 2){
+            throw new UnauthorizedException('잘못된 유형의 토큰입니다.');
+        }
+
+        const email = split[0];
+        const password = split[1];
+
+        return {
+            email,
+            password,
+        }
+    }
+
+    verifyToken(token: string){
+        return this.jwtService.verify(token,{
+            secret: JWT_SECRET,
+        });
+    }
+
+    rotateToken(token: string, isRefreshToken: boolean){
+        const decoded = this.jwtService.verify(token, {
+            secret: JWT_SECRET,
+        });
+        /**
+         * sub: id,
+         * email: email,
+         * type: 'access' | 'refresh'
+         */
+        if(decoded.type !== 'refresh'){
+            throw new UnauthorizedException('토큰 재발급은 리프레쉬 토큰으로만 가능합니다.');
+        }
+
+        return this.signToken({
+           ...decoded,
+        }, isRefreshToken);
     }
 
 
