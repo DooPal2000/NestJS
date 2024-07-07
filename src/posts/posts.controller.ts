@@ -3,6 +3,7 @@ import { PostsService } from './posts.service';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { User } from 'src/users/decorator/user.decorator';
+import { CreatePostDto } from './dto/create-post.dto';
 
 /**
 * author :string;
@@ -29,17 +30,16 @@ export class PostsController {
   }
 
 
-
+  // DTO 추가, 240707
   @Post()
   @UseGuards(AccessTokenGuard)
   postPosts(
-    //@Request() req:any,
+    // @Request() req:any,
     @User('id') userId : number,
-    @Body('title') title: string,
-    @Body('content') content: string,
+    @Body() body: CreatePostDto,
   ) {
     return this.postsService.createPost(
-      userId, title, content
+      userId, body,
     );
   }
 
