@@ -1,7 +1,7 @@
-import { Body, Controller, Head, Headers, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MaxLengthPipe, MinLengthPipe } from './pipe/password.pipe';
-// import { BasicTokenGuard } from './guard/basic-token.guard';
+import { BasicTokenGuard } from './guard/basic-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,11 +27,11 @@ export class AuthController {
     }
   }
 
+
   @Post('login/email')
+  @UseGuards(BasicTokenGuard)
   postLoginEmail(
     @Headers('authorization') rawToken: string,
-    // @Body('email') email: string,
-    // @Body('password') password: string,
   ) {
     // email:password -> base64
     // acncsjklded -> email:password
@@ -57,27 +57,27 @@ export class AuthController {
   // }
 
 
-  @Post('register/email')
-  postRegisterEmail(@Body('nickname') nickname: string,
-    @Body('email') email: string,
-    @Body('password') password: string) {
-    return this.authService.registerWithEmail({
-      nickname,
-      email,
-      password,
-    })
-  }
-
-  // @Post('reigiser/email')
+  // @Post('register/email')
   // postRegisterEmail(@Body('nickname') nickname: string,
   //   @Body('email') email: string,
-  //   @Body('password', new MaxLengthPipe(8), new MinLengthPipe(3)) password: string,
-  // ) {
+  //   @Body('password') password: string) {
   //   return this.authService.registerWithEmail({
   //     nickname,
   //     email,
   //     password,
   //   })
   // }
+
+  @Post('reigiser/email')
+  postRegisterEmail(@Body('nickname') nickname: string,
+    @Body('email') email: string,
+    @Body('password', new MaxLengthPipe(8), new MinLengthPipe(3)) password: string,
+  ) {
+    return this.authService.registerWithEmail({
+      nickname,
+      email,
+      password,
+    })
+  }
 
 }
