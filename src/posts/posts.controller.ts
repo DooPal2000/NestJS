@@ -4,6 +4,7 @@ import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 /**
 * author :string;
@@ -35,7 +36,7 @@ export class PostsController {
   @UseGuards(AccessTokenGuard)
   postPosts(
     // @Request() req:any,
-    @User('id') userId : number,
+    @User('id') userId: number,
     @Body() body: CreatePostDto,
   ) {
     return this.postsService.createPost(
@@ -46,17 +47,18 @@ export class PostsController {
   @Put(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
   putPost(
     @Param('id', ParseIntPipe) id: number,
-    @Body('title') title?: string,
-    @Body('content') content?: string,
+    @Body() body: UpdatePostDto,
+    // @Body('title') title?: string,
+    // @Body('content') content?: string,
   ) {
     return this.postsService.updatePost(
-      id, title, content
+      id, body,
     );
   }
 
   @Delete(':id')
   deletePost(
-    @Param('id',ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
   ) {
     return this.postsService.deletePost(+id);
   }
