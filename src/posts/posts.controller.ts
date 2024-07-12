@@ -44,8 +44,8 @@ export class PostsController {
     );
   }
 
-  @Put(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
-  putPost(
+  @Patch(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
+  patchPost(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdatePostDto,
     // @Body('title') title?: string,
