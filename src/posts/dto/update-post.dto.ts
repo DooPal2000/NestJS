@@ -2,14 +2,19 @@ import { PartialType, PickType } from "@nestjs/mapped-types";
 import { PostsModel } from "../entities/posts.entity";
 import { CreatePostDto } from "./create-post.dto";
 import { IsOptional, IsString } from "class-validator";
+import { stringValidationMessage } from "src/common/validation-message/string-validation.message";
 
 export class UpdatePostDto extends PartialType(CreatePostDto) {
     // 문맥적 파악 용이, PartialType을 지워도, 현재 프로젝트상에는 문제가 없다.
-    @IsString()
+    @IsString({
+        message: stringValidationMessage
+    })
     @IsOptional()
     title?: string;
 
-    @IsString()
+    @IsString({
+        message: stringValidationMessage
+    })
     @IsOptional()
     content?: string;
 }

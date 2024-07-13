@@ -1,26 +1,27 @@
 import { IsString } from "class-validator";
 import { BaseModel } from "src/common/entity/base.entity";
+import { stringValidationMessage } from "src/common/validation-message/string-validation.message";
 import { UsersModel } from "src/users/entities/users.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
-export class PostsModel extends BaseModel{
+export class PostsModel extends BaseModel {
 
-    @ManyToOne(()=> UsersModel, (user)=> user.posts, {
+    @ManyToOne(() => UsersModel, (user) => user.posts, {
         nullable: false
     })
     author: UsersModel;
-    
+
 
     @Column()
     @IsString({
-        message: 'title은 string 타입을 입력해줘야 합니다.'
+        message: stringValidationMessage,
     })
     title: string;
 
     @Column()
     @IsString({
-        message: 'content는 string 타입을 입력해줘야 합니다.'
+        message: stringValidationMessage,
     })
     content: string;
 
@@ -29,5 +30,5 @@ export class PostsModel extends BaseModel{
 
     @Column()
     commentCount: number;
-    
+
 }
