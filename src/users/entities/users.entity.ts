@@ -42,6 +42,7 @@ export class UsersModel extends BaseModel {
         message: lengthValidationMessage,
     })
     /**
+     * Exclude 옵션
      * Request 
      * 프엔 -> 백엔
      * plain object (JSON) -> class instance(dto) 
