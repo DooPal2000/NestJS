@@ -41,8 +41,27 @@ export class UsersModel extends BaseModel {
     @Length(3, 8, {
         message: lengthValidationMessage,
     })
-    @Exclude()
+    /**
+     * Request 
+     * 프엔 -> 백엔
+     * plain object (JSON) -> class instance(dto) 
+     * 
+     * Response
+     * 백엔 -> 프엔
+     * class instance(dto) -> plain object (JSON)
+     * 
+     * *toClassOnly -> class instance 로 변환될때만 제외
+     * *toPlainOnly -> plain object 로 변환될때만 제외
+     */
+    @Exclude({
+        toPlainOnly: true,
+    })
     password: string;
+
+
+
+
+
 
     @Column({
         enum: Object.values(RolesEnum),
