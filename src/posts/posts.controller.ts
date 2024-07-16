@@ -24,7 +24,7 @@ export class PostsController {
   getPosts(
     @Query() query: PaginatePostDto,
   ) {
-    return this.postsService.getAllPosts();
+    return this.postsService.paginatePosts(query);
   }
 
   @Get(':id')
