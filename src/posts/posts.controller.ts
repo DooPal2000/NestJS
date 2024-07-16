@@ -26,6 +26,14 @@ export class PostsController {
   ) {
     return this.postsService.paginatePosts(query);
   }
+ // POST /posts/random
+  @Post('random')
+  @UseGuards(AccessTokenGuard)
+  async postPostsRandom(@User() user: UsersModel){
+    await this.postsService.generatePosts(user.id);
+    
+    return true;
+  }
 
   @Get(':id')
   getPost(@Param('id', ParseIntPipe) id: number) { // param 데코레이터에 파라미터 이름이 id이다. 

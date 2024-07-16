@@ -21,6 +21,14 @@ export class PostsService {
             relations: ['author'],
         });
     }
+    async generatePosts(userId: number) {
+        for (let i = 0; i < 100; i++) {
+            await this.createPost(userId, {
+                title: `임의로 생성된 포스트 ${i}`,
+                content: `임의로 생성된 포스트내용 ${i}`,
+            });
+        }
+    }
 
     // 1) 오름차 순으로 정렬하는 pagination만 구현한다.
     async paginatePosts(dto: PaginatePostDto) {
@@ -50,6 +58,7 @@ export class PostsService {
             data: posts,
         }
     }
+    a
 
     async getPostById(id: number) {
         const post = await this.postsRepository.findOne({
