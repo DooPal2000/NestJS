@@ -6,6 +6,7 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
+import { count } from 'console';
 
 
 
@@ -44,6 +45,32 @@ export class PostsService {
             take: dto.take,
         });
 
+        // 해당되는 Post 가 0개 이상이면 
+        // 마지막 포스트를 가져오고
+        // 아니면 null 반환
+        const lastItem = posts.length > 0 ? posts[posts.length - 1] : null;
+        
+        const nextUrl = new URL('http://localhost:3000/posts');
+
+        if(nextUrl){
+            /**
+             * dto의 키값들을 루핑하면서
+             * 키값에 해당되는 벨류가 존재하면
+             * param에 그대로 붙여넣는다.
+             * 
+             * 단, where__id_more_than 값만 lastItem의 마지막 값으로 넣어준다.
+             */
+            for(const key of Object.keys(dto)){
+                if(dto[key]){
+                    if(key === 'where__id_more_than'){
+                        nextUrl.searchParams.append(key, lastItem.id.toString());
+                    }else{
+                        nextUrl.searchParams.append(key, dto[key]);
+                    }
+                }
+            }
+            
+        }
         /**
          * Response
          * 
@@ -56,9 +83,14 @@ export class PostsService {
          */
         return {
             data: posts,
+            cursor: {
+                after: lastItem?.id,
+            },
+            count: posts.length,
+            next: nextUrl?.toString(),
         }
     }
-    a
+    
 
     async getPostById(id: number) {
         const post = await this.postsRepository.findOne({
