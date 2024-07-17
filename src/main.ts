@@ -7,7 +7,10 @@ async function bootstrap() {
   
   // 앱 전체에 해당되는 파이프를 넣어준다(240707)
   app.useGlobalPipes(new ValidationPipe({
-    transform: true
+    transform: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    }
   }));
   await app.listen(3000);
 }
