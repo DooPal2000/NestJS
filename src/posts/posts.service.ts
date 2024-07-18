@@ -7,6 +7,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { count } from 'console';
+import { HOST, PROTOCOL } from 'src/common/const/env.const';
 
 
 
@@ -48,10 +49,8 @@ export class PostsService {
         // 해당되는 Post 가 0개 이상이면 
         // 마지막 포스트를 가져오고
         // 아니면 null 반환
-        const lastItem = posts.length > 0 ? posts[posts.length - 1] : null;
-        
-        const nextUrl = new URL('http://localhost:3000/posts');
-
+        const lastItem = posts.length > 0 ? posts[posts.length - 1] : null;        
+        const nextUrl = new URL(`${PROTOCOL}://${HOST}`);
         if(nextUrl){
             /**
              * dto의 키값들을 루핑하면서
@@ -62,14 +61,13 @@ export class PostsService {
              */
             for(const key of Object.keys(dto)){
                 if(dto[key]){
-                    if(key === 'where__id_more_than'){
-                        nextUrl.searchParams.append(key, lastItem.id.toString());
-                    }else{
+                    if(key !== 'where__id_more_than'){
                         nextUrl.searchParams.append(key, dto[key]);
                     }
                 }
             }
-            
+
+            nextUrl.searchParams.append('where__id_more_than', lastItem.id.toString());
         }
         /**
          * Response
