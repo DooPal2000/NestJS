@@ -65,10 +65,10 @@ export class PostsService {
 
     async cursorPaginatePosts(dto: PaginatePostDto) {
         const where: FindOptionsWhere<PostsModel> = {};
-        if (dto.where__id_less_than) {
-            where.id = LessThan(dto.where__id_less_than);
-        } else if (dto.where__id_more_than) {
-            where.id = MoreThan(dto.where__id_more_than);
+        if (dto.where__id__less_than) {
+            where.id = LessThan(dto.where__id__less_than);
+        } else if (dto.where__id__more_than) {
+            where.id = MoreThan(dto.where__id__more_than);
         }
 
         const posts = await this.postsRepository.find({
