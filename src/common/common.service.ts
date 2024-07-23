@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BasePaginationDto } from './dto/base-pagination.dto';
 import { FindManyOptions, FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { BaseModel } from './entity/base.entity';
+import { FILTER_MAPPER } from './const/filter-mapper.const';
 
 @Injectable()
 export class CommonService {
@@ -104,10 +105,56 @@ export class CommonService {
             skip: dto.page ? dto.take * (dto.page - 1) : null,
         };
     }
-    parseOrderFilter(key: string, value: any): FindOptionsOrder<T> {
-        throw new Error('Method not implemented.');
+    private parseOrderFilter<T extends BaseModel>(key: string, value: any):
+        FindOptionsOrder<T> {
     }
-    private parseWhereFilter<T extends BaseModel>(key: string, value: any): FindOptionsWhere<T> {
+    private parseWhereFilter<T extends BaseModel>(key: string, value: any):
+        FindOptionsWhere<T> {
+        const options: FindOptionsWhere<T> = {};
+        const split = key.split('__');
+        if (split.length !== 2 && split.length !== 3) {
+            throw new BadRequestException();
+            `where 필터는 '__'로 split 했을때 길이가 2 or 3 이어야 합니다. 문제되는 키값 : ${key}`
+        }
+        if (split.length === 2) {
+            // [where, id]
+            const [_, field] = split;
+            /**
+             * 이 경우는 where__id
+             * field -> 'id'
+             * value -> 3
+             */
+            options[field] = value;
+        } else {
+            /**
+             * 길이가 3일 경우에는 where__id__more_than 호은 less_than
+             * where 버리고, 두번째 값은 필터할 키값,
+             * 세번째 값은 typeorm 유틸리티가 된다.
+             * 
+             * FILTER_MAPPER에 미리 정의해둔 값들로
+             * field 값에 FILTER_MAPPER에서 해당되는 utility를 가져온 후 값에 적용
+             */
 
+            // ['where','id','more_than']
+            const [_, field, operator] = split;
+
+            // where__id_between = 3,4
+            // 만약에 split 대상 문자가 존재하지 않으면 길이가 무조건 1
+            // const values = value.toString().split(',')
+
+            // field -> id
+            // operator -> more_than
+            // FILTER_MAPPER[operator] -> MoreThan
+
+            // if(operator ==='between'){
+            //     options[field] = FILTER_MAPPER[operator](value[0], value[1]);
+            // }else{
+            //     options[field] = FILTER_MAPPER[operator](value);
+            // }
+            
+            options[field] = FILTER_MAPPER[operator](value);
+
+        }
+        return options;
     }
 }
