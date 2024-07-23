@@ -105,9 +105,6 @@ export class CommonService {
             skip: dto.page ? dto.take * (dto.page - 1) : null,
         };
     }
-    private parseOrderFilter<T extends BaseModel>(key: string, value: any):
-        FindOptionsOrder<T> {
-    }
     private parseWhereFilter<T extends BaseModel>(key: string, value: any):
         FindOptionsWhere<T> {
         const options: FindOptionsWhere<T> = {};
@@ -123,7 +120,7 @@ export class CommonService {
              * 이 경우는 where__id
              * field -> 'id'
              * value -> 3
-             */
+            */
             options[field] = value;
         } else {
             /**
@@ -133,7 +130,7 @@ export class CommonService {
              * 
              * FILTER_MAPPER에 미리 정의해둔 값들로
              * field 값에 FILTER_MAPPER에서 해당되는 utility를 가져온 후 값에 적용
-             */
+            */
 
             // ['where','id','more_than']
             const [_, field, operator] = split;
@@ -151,10 +148,27 @@ export class CommonService {
             // }else{
             //     options[field] = FILTER_MAPPER[operator](value);
             // }
-            
+
             options[field] = FILTER_MAPPER[operator](value);
 
         }
         return options;
+    }
+    private parseOrderFilter<T extends BaseModel>(key: string, value: any):
+        FindOptionsOrder<T> {
+        const order: FindOptionsOrder<T> = {};
+        // order 는 무조건 2개로 스플릿된다.
+        const split = key.split('__');
+
+        if (split.length !== 2) {
+            throw new BadRequestException(
+                `order 필터는 '__'로 split 했을 때 길이가 2여야 합니다. -문제되는 키값: ${key}`,
+            )
+        }
+
+        const [_, field] = split;
+        order[field] = value; // 이게 속성 추가 로직이다 order { filed : value }
+
+        return order;
     }
 }
