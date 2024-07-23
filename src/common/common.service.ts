@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BasePaginationDto } from './dto/base-pagination.dto';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { BaseModel } from './entity/base.entity';
 
 @Injectable()
@@ -44,14 +44,14 @@ export class CommonService {
         /**
          * where__likeCount__more_than
          * 
-         * where__title__ilike
+         * where__title__ilike 
          */
 
     }
-    
-    private composeFindOptions()<T extends BaseModel>(
+
+    private composeFindOptions<T extends BaseModel>(
         dto: BasePaginationDto,
-    ) : FindManyOptions<T>{
+    ): FindManyOptions<T> {
         /**
          * where,
          * order,
@@ -78,5 +78,36 @@ export class CommonService {
          *  3-2) 2개의 값으로 나뉜다면, 정확한 값을 필터하는 것이기 때문에 operator 없이 적용한다.
          * 4) order 의 경우, 3-2와 같이 적용한다.
          */
+        let where: FindOptionsWhere<T> = {};
+        let order: FindOptionsOrder<T> = {};
+
+        for (const [key, value] of Object.entries(dto)) {
+
+
+            if (key.startsWith('where__')) {
+                where = {
+                    ...where,
+                    ...this.parseWhereFilter(key, value),
+                }
+            } else if (key.startsWith('order__')) {
+                order = {
+                    ...order,
+                    ...this.parseOrderFilter(key, value),
+                }
+            }
+        }
+
+        return {
+            where,
+            order,
+            take: dto.take,
+            skip: dto.page ? dto.take * (dto.page - 1) : null,
+        };
+    }
+    parseOrderFilter(key: string, value: any): FindOptionsOrder<T> {
+        throw new Error('Method not implemented.');
+    }
+    private parseWhereFilter<T extends BaseModel>(key: string, value: any): FindOptionsWhere<T> {
+
     }
 }
