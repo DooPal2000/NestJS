@@ -4,6 +4,7 @@ import { FindManyOptions, FindOptionsOrder, FindOptionsWhere, Repository } from 
 import { BaseModel } from './entity/base.entity';
 import { FILTER_MAPPER } from './const/filter-mapper.const';
 import { HOST, PROTOCOL } from './const/env.const';
+import { find } from 'rxjs';
 
 @Injectable()
 export class CommonService {
@@ -35,6 +36,15 @@ export class CommonService {
         repository: Repository<T>,
         overrideFindOptions: FindManyOptions<T> = {},
     ) {
+        const findOptions = this.composeFindOptions<T>(dto);
+        const [data, count] = await repository.findAndCount({
+            ...findOptions,
+            ...overrideFindOptions,
+        });
+        const results = await repository.find({
+            ...findOptions,
+            ...overrideFindOptions,
+        });
 
     }
     private async cursorPaginate<T extends BaseModel>(
