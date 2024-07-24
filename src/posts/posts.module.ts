@@ -8,6 +8,9 @@ import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { AuthModule } from 'src/auth/auth.module';
+import { UsersModule } from 'src/users/users.module';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   imports: [
@@ -15,6 +18,9 @@ import { UsersModel } from 'src/users/entities/users.entity';
       PostsModel,
       UsersModel,
     ]),
+    AuthModule,
+    UsersModule,
+    CommonModule,
     JwtModule.register({}),
 
   ],
