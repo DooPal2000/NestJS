@@ -7,8 +7,9 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { count } from 'console';
-import { HOST, PROTOCOL } from 'src/common/const/env.const';
 import { CommonService } from 'src/common/common.service';
+import { ConfigService } from '@nestjs/config';
+import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from 'src/common/const/env-keys.const';
 
 
 
@@ -18,6 +19,7 @@ export class PostsService {
         @InjectRepository(PostsModel)
         private readonly postsRepository: Repository<PostsModel>,
         private readonly commonService: CommonService,
+        private readonly configService: ConfigService,
     ) { }
 
     async getAllPosts() {
@@ -47,7 +49,7 @@ export class PostsService {
             dto,
             this.postsRepository,
             {
-                relations:['author']
+                relations: ['author']
             },
             'posts'
         );
@@ -96,8 +98,11 @@ export class PostsService {
         // 해당되는 Post 가 0개 이상이면 
         // 마지막 포스트를 가져오고
         // 아니면 null 반환
+        const protocol = this.configService.get<string>(ENV_PROTOCOL_KEY);
+        const host = this.configService.get<string>(ENV_HOST_KEY);
+
         const lastItem = posts.length > 0 && posts.length === dto.take ? posts[posts.length - 1] : null;
-        const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`);
+        const nextUrl = lastItem && new URL(`${protocol}://${host}/posts`);
         if (nextUrl) {
             /**
              * dto의 키값들을 루핑하면서
