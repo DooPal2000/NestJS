@@ -3,13 +3,19 @@ import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 import { BasePaginationDto } from "src/common/dto/base-pagination.dto";
 
 export class PaginatePostDto extends BasePaginationDto{
+
+    // 아래 6줄이 주석처리되었을 시, 이 속성으로 접근 불가능하도록 main.ts에 whitelist를 true 로 세팅합니다.
+    // ++ 추가로, forbidNonWhitelisted : true 로도 설정합니다 (단순 스트리핑이 아니고, )
+
     @IsNumber()
     @IsOptional()
-    where__id__more_than?: number;
+    where__likeCount__more_than: number;
 
     @IsString()
     @IsOptional()
     where__title__i_like: string;
+
+
 
     // 앞으로는, 상속을 통해 DTO를 구현하도록 합니다
     
