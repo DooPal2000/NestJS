@@ -96,8 +96,6 @@ export class CommonService {
             nextUrl.searchParams.append(key, lastItem.id.toString())
         }
 
-        console.log('curSorPagination result:', { results });
-
         return {
             data: results,
             cursor: {
