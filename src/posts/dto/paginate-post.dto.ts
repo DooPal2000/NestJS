@@ -1,10 +1,17 @@
 import { Type } from "class-transformer";
-import { IsIn, IsNumber, IsOptional } from "class-validator";
+import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 import { BasePaginationDto } from "src/common/dto/base-pagination.dto";
 
 export class PaginatePostDto extends BasePaginationDto{
-    // 앞으로는, 상속을 통해 DTO를 구현하도록 합니다
+    @IsNumber()
+    @IsOptional()
+    where__id__more_than?: number;
 
+    @IsString()
+    @IsOptional()
+    where__title__i_like: string;
+
+    // 앞으로는, 상속을 통해 DTO를 구현하도록 합니다
     
     // @IsNumber()
     // @IsOptional()

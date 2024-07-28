@@ -41,7 +41,9 @@ export class PostsService {
         //     return this.cursorPaginatePosts(dto);
         // }
 
-        return this.commonService.paginate(
+        console.log('paginatePosts dto:', dto);
+
+        return await this.commonService.paginate(
             dto,
             this.postsRepository,
             {},

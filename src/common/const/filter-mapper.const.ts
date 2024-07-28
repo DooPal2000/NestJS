@@ -33,7 +33,7 @@ export const FILTER_MAPPER = {
     more_than_or_equal: MoreThanOrEqual,
     equal: Equal,
     like: Like,
-    ilike: ILike,
+    i_like: ILike,
     in: In,
     any: Any,
     between: Between,

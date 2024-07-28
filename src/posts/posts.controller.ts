@@ -24,8 +24,11 @@ export class PostsController {
   getPosts(
     @Query() query: PaginatePostDto,
   ) {
+    console.log('Received query:', query);
     return this.postsService.paginatePosts(query);
   }
+
+
  // POST /posts/random
   @Post('random')
   @UseGuards(AccessTokenGuard)
