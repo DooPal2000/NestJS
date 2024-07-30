@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, LessThan, MoreThan, Repository } from 'typeorm';
 import { PostsModel } from './entities/posts.entity';
@@ -10,6 +10,9 @@ import { count } from 'console';
 import { CommonService } from 'src/common/common.service';
 import { ConfigService } from '@nestjs/config';
 import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from 'src/common/const/env-keys.const';
+import { POST_IMAGE_PATH, PUBLIC_FOLDER_NAME, PUBLIC_FOLDER_PATH, TEMP_FOLDER_PATH } from 'src/common/const/path.const';
+import { basename, join } from 'path';
+import { promises } from 'fs';
 
 
 
@@ -160,6 +163,38 @@ export class PostsService {
 
         return post;
     }
+
+    async createPostImage(dto: CreatePostDto) {
+        // dto 이미지 이름을 기반으로
+        // 파일의 경로를 생성한다. 
+        const tempFilePath = join(
+            TEMP_FOLDER_PATH,
+            dto.image,
+        );
+        
+        try{
+            // 파일이 존재하는지 확인
+            // 만약에 존재하지 않는다면 에러를 던짐
+            await promises.access(tempFilePath);
+        }catch(e){
+            throw new BadRequestException('존재하지 않는 파일입니다.')
+        }
+
+        // 파일의 이름만 가져오기
+        // /Users/aaa/bbb/ccc/asdf.jpg => asdf.jpg
+        const fileName = basename(tempFilePath);
+        
+        // 새로 이동할 포스트 폴더의 경로 + 이미지 이름
+        // {프로젝트 경로}/public/posts/asdf.jpg
+        const newPath = join(
+            POST_IMAGE_PATH,
+            fileName,
+        );
+        
+        await promises.rename(tempFilePath, newPath);
+        return true;
+    }
+
 
     async createPost(authorId: number, postDto: CreatePostDto,) {
         // 1. create -> 저장될 객체를 생성한다
