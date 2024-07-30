@@ -44,8 +44,11 @@ export class PostsController {
     return this.postsService.getPostById(+id);
   }
 
-
-  // DTO 추가, 240707
+  /**
+   * DTO 추가, 240707
+   * 트랜잭션 이론, 20240731
+   * start, commit, rollback
+   */
   @Post()
   @UseGuards(AccessTokenGuard)
   async postPosts(
