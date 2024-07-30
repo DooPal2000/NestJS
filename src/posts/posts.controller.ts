@@ -48,7 +48,6 @@ export class PostsController {
   // DTO 추가, 240707
   @Post()
   @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('image'))
   postPosts(
     // @Request() req:any,
     @User('id') userId: number,
@@ -56,7 +55,7 @@ export class PostsController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.postsService.createPost(
-      userId, body, file?.filename,
+      userId, body,
     );
   }
 
