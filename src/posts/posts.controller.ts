@@ -7,6 +7,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageModelType } from 'src/common/entity/image.entity';
 
 /**
 * author :string;
@@ -25,19 +26,18 @@ export class PostsController {
   getPosts(
     @Query() query: PaginatePostDto,
   ) {
-    console.log('Received query:', query);
     return this.postsService.paginatePosts(query);
   }
 
 
  // POST /posts/random
-  @Post('random')
-  @UseGuards(AccessTokenGuard)
-  async postPostsRandom(@User() user: UsersModel){
-    await this.postsService.generatePosts(user.id);
+  // @Post('random')
+  // @UseGuards(AccessTokenGuard)
+  // async postPostsRandom(@User() user: UsersModel){
+  //   await this.postsService.generatePosts(user.id);
     
-    return true;
-  }
+  //   return true;
+  // }
 
   @Get(':id')
   getPost(@Param('id', ParseIntPipe) id: number) { // param 데코레이터에 파라미터 이름이 id이다. 
@@ -55,12 +55,21 @@ export class PostsController {
     // @Request() req:any,
     @User('id') userId: number,
     @Body() body: CreatePostDto,
-    @UploadedFile() file?: Express.Multer.File,
   ) {
-    await this.postsService.createPostImage(body);
-    return this.postsService.createPost(
+    const post = await this.postsService.createPost(
       userId, body,
     );
+
+    for(let i = 0; i < body.images.length; i++){
+      await this.postsService.createPostImage({
+        post,
+        order: i,
+        path: body.images[i],
+        type: ImageModelType.POST_IMAGE,
+      });
+    }
+
+    return this.postsService.getPostById(post.id);
   }
 
   @Patch(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)

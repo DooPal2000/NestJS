@@ -13,6 +13,9 @@ import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from 'src/common/const/env-keys.const'
 import { POST_IMAGE_PATH, PUBLIC_FOLDER_NAME, PUBLIC_FOLDER_PATH, TEMP_FOLDER_PATH } from 'src/common/const/path.const';
 import { basename, join } from 'path';
 import { promises } from 'fs';
+import { CreatePostImageDto } from './image/create-image.dto';
+import { ImageModel } from 'src/common/entity/image.entity';
+import { DEFAULT_POST_FIND_OPTIONS } from './const/default-post-find-options';
 
 
 
@@ -21,20 +24,24 @@ export class PostsService {
     constructor(
         @InjectRepository(PostsModel)
         private readonly postsRepository: Repository<PostsModel>,
+        @InjectRepository(ImageModel)
+        private readonly imageRepository: Repository<ImageModel>,
         private readonly commonService: CommonService,
         private readonly configService: ConfigService,
     ) { }
 
     async getAllPosts() {
         return await this.postsRepository.find({
-            relations: ['author'],
+            ...DEFAULT_POST_FIND_OPTIONS
         });
     }
+
     async generatePosts(userId: number) {
         for (let i = 0; i < 100; i++) {
             await this.createPost(userId, {
                 title: `임의로 생성된 포스트 ${i}`,
                 content: `임의로 생성된 포스트내용 ${i}`,
+                images: []
             });
         }
     }
@@ -52,13 +59,14 @@ export class PostsService {
             dto,
             this.postsRepository,
             {
-                relations: ['author']
+                ...DEFAULT_POST_FIND_OPTIONS,
             },
             'posts'
         );
     }
     async pagePaginatePosts(dto: PaginatePostDto) {
         /**
+         *  더이상 사용하지 않음 (202407월말)
          * data : Data[],
          * total: number,
          * next: ??
@@ -82,6 +90,7 @@ export class PostsService {
 
 
     async cursorPaginatePosts(dto: PaginatePostDto) {
+        // 더이상 사용하지 않음 (202407월말)
         const where: FindOptionsWhere<PostsModel> = {};
         if (dto.where__id__less_than) {
             where.id = LessThan(dto.where__id__less_than);
@@ -152,10 +161,10 @@ export class PostsService {
 
     async getPostById(id: number) {
         const post = await this.postsRepository.findOne({
+            ...DEFAULT_POST_FIND_OPTIONS,
             where: {
                 id,
             },
-            relations: ['author'],
         });
         if (!post) {
             throw new NotFoundException();
@@ -164,12 +173,13 @@ export class PostsService {
         return post;
     }
 
-    async createPostImage(dto: CreatePostDto) {
+    async createPostImage(dto: CreatePostImageDto) {
         // dto 이미지 이름을 기반으로
         // 파일의 경로를 생성한다. 
         const tempFilePath = join(
             TEMP_FOLDER_PATH,
-            dto.image,
+            dto.path,
+            // dto.images
         );
         
         try{
@@ -190,9 +200,14 @@ export class PostsService {
             POST_IMAGE_PATH,
             fileName,
         );
-        
+        // save
+        const result = await this.imageRepository.save({
+            ...dto,
+        })
+
+        // 파일 옮기기
         await promises.rename(tempFilePath, newPath);
-        return true;
+        return result;
     }
 
 
@@ -206,7 +221,9 @@ export class PostsService {
             },
             ...postDto,
             likeCount: 0,
-            commentCount: 0
+            commentCount: 0,
+            images: [],
+            // dto.images,
         });
 
         const newPost = await this.postsRepository.save(post);
