@@ -9,6 +9,7 @@ import { PaginatePostDto } from './dto/paginate-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageModelType } from 'src/common/entity/image.entity';
 import { DataSource } from 'typeorm';
+import { PostsImagesService } from './image/images.service';
 
 /**
 * author :string;
@@ -24,6 +25,7 @@ export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly dataSource: DataSource,
+    private readonly postsImagesService: PostsImagesService,
 
   ) { }
 
@@ -72,16 +74,16 @@ export class PostsController {
     //로직 실행
     try{
       const post = await this.postsService.createPost(
-        userId, body,
+        userId, body, qr
       );
   
       for (let i = 0; i < body.images.length; i++) {
-        await this.postsService.createPostImage({
+        await this.postsImagesService.createPostImage({
           post,
           order: i,
           path: body.images[i],
           type: ImageModelType.POST_IMAGE,
-        });
+        }, qr);
       }
   
       await qr.commitTransaction();

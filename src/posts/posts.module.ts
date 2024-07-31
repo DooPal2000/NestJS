@@ -17,6 +17,7 @@ import * as multer from 'multer';
 import { POST_IMAGE_PATH } from 'src/common/const/path.const';
 import { v4 as uuid } from 'uuid';
 import { ImageModel } from 'src/common/entity/image.entity';
+import { PostsImagesService } from './image/images.service';
 
 @Module({
   imports: [
@@ -33,8 +34,9 @@ import { ImageModel } from 'src/common/entity/image.entity';
   controllers: [PostsController],
   providers: [
     PostsService,
-    AuthService,
-    UsersService,
+    PostsImagesService,
+    // AuthService,
+    // UsersService,
     // AccessTokenGuard,
   ],
 })
