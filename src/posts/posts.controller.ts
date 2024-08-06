@@ -74,11 +74,11 @@ export class PostsController {
     await qr.startTransaction();
 
     //로직 실행
-    try{
+    try {
       const post = await this.postsService.createPost(
         userId, body, qr
       );
-  
+
       for (let i = 0; i < body.images.length; i++) {
         await this.postsImagesService.createPostImage({
           post,
@@ -87,11 +87,11 @@ export class PostsController {
           type: ImageModelType.POST_IMAGE,
         }, qr);
       }
-  
+
       await qr.commitTransaction();
       return this.postsService.getPostById(post.id);
 
-    }catch(e){
+    } catch (e) {
       // 어떤 에러가 발생하든, 트랜잭션 종료 후 롤백
       await qr.rollbackTransaction();
       await qr.release();
