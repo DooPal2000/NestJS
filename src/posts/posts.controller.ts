@@ -11,6 +11,7 @@ import { ImageModelType } from 'src/common/entity/image.entity';
 import { DataSource } from 'typeorm';
 import { PostsImagesService } from './image/images.service';
 import { LogInterceptor } from 'src/common/interceptor/log.interceptor';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 
 /**
 * author :string;
@@ -60,42 +61,28 @@ export class PostsController {
    */
   @Post()
   @UseGuards(AccessTokenGuard)
+  @UseInterceptors(TransactionInterceptor)
   async postPosts(
     // @Request() req:any,
     @User('id') userId: number,
     @Body() body: CreatePostDto,
   ) {
-    // 트랜잭션과 관련된 모든 쿼리를 담당할 쿼리 러너 생성
-    const qr = this.dataSource.createQueryRunner();
-    await qr.connect();
-    // 쿼리 러너에서 트랜잭션을 시작한다.
-    // 이 시점부터 같은 쿼리 러너를 사용하면
-    // 트랜잭션 안에서 데이터베이스 액션을 실행할 수 있다.
-    await qr.startTransaction();
-
     //로직 실행
-    try {
-      const post = await this.postsService.createPost(
-        userId, body, qr
-      );
+    const post = await this.postsService.createPost(
+      userId, body, qr
+    );
 
-      for (let i = 0; i < body.images.length; i++) {
-        await this.postsImagesService.createPostImage({
-          post,
-          order: i,
-          path: body.images[i],
-          type: ImageModelType.POST_IMAGE,
-        }, qr);
-      }
-
-      await qr.commitTransaction();
-      return this.postsService.getPostById(post.id);
-
-    } catch (e) {
-      // 어떤 에러가 발생하든, 트랜잭션 종료 후 롤백
-      await qr.rollbackTransaction();
-      await qr.release();
+    for (let i = 0; i < body.images.length; i++) {
+      await this.postsImagesService.createPostImage({
+        post,
+        order: i,
+        path: body.images[i],
+        type: ImageModelType.POST_IMAGE,
+      }, qr);
     }
+
+    await qr.commitTransaction();
+    return this.postsService.getPostById(post.id);
   }
 
   @Patch(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)

@@ -5,9 +5,7 @@ import { DataSource } from "typeorm";
 export class TransactionInterceptor implements NestInterceptor {
     constructor(
         private readonly dataSource: DataSource,
-    ) {
-
-    }
+    ) {}
     async intercept(context: ExecutionContext, next: CallHandler<any>): Promise<Observable<any>> {
         const req = context.switchToHttp().getRequest();
 
