@@ -5,7 +5,11 @@ export const QueryRunner = createParamDecorator(
         const req = context.switchToHttp().getRequest();
 
         if(!req.queryRunner){
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(
+                `QueryRunner Decorator 를 사용하려면 TransactionInterceptor를 적용해야 합니다.`
+            );
         }
+
+        return req.queryRunner;
     }
 );

@@ -8,10 +8,11 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageModelType } from 'src/common/entity/image.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner as QR } from 'typeorm';
 import { PostsImagesService } from './image/images.service';
 import { LogInterceptor } from 'src/common/interceptor/log.interceptor';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 
 /**
 * author :string;
@@ -66,6 +67,7 @@ export class PostsController {
     // @Request() req:any,
     @User('id') userId: number,
     @Body() body: CreatePostDto,
+    @QueryRunner() qr: QR,
   ) {
     //로직 실행
     const post = await this.postsService.createPost(
@@ -82,7 +84,7 @@ export class PostsController {
     }
 
     await qr.commitTransaction();
-    return this.postsService.getPostById(post.id);
+    return this.postsService.getPostById(post.id, qr);
   }
 
   @Patch(':id') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)

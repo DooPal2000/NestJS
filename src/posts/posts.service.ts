@@ -159,8 +159,10 @@ export class PostsService {
     }
 
 
-    async getPostById(id: number) {
-        const post = await this.postsRepository.findOne({
+    async getPostById(id: number, qr?: QueryRunner) {
+        const repository = this.getRepository(qr);
+
+        const post = await repository.findOne({
             ...DEFAULT_POST_FIND_OPTIONS,
             where: {
                 id,
@@ -177,7 +179,7 @@ export class PostsService {
     }
 
 
-    getRepository(qr?: QueryRunner){
+    getRepository(qr?: QueryRunner) {
         return qr ? qr.manager.getRepository<PostsModel>(PostsModel) : this.postsRepository;
     }
     async createPost(authorId: number, postDto: CreatePostDto, qr?: QueryRunner) {
