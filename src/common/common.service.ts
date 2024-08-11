@@ -18,7 +18,7 @@ export class CommonService {
         overrideFindOptions: FindManyOptions<T> = {},
         path: string,
     ) {
-        console.log('CommonService paginate dto:', dto);
+        // console.log('CommonService paginate dto:', dto);
 
         if (dto.page) {
             return this.pagePaginate(

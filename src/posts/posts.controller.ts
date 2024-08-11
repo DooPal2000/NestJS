@@ -34,8 +34,7 @@ export class PostsController {
   ) { }
 
   @Get()
-  @UseInterceptors(LogInterceptor)
-  @UseFilters(HttpExceptionFilter)
+  // @UseInterceptors(LogInterceptor)
   getPosts(
     @Query() query: PaginatePostDto,
   ) {

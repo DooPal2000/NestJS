@@ -1,4 +1,4 @@
-import { BadRequestException, Module } from '@nestjs/common';
+import { BadRequestException, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -18,6 +18,7 @@ import { POST_IMAGE_PATH } from 'src/common/const/path.const';
 import { v4 as uuid } from 'uuid';
 import { ImageModel } from 'src/common/entity/image.entity';
 import { PostsImagesService } from './image/images.service';
+import { LogMiddleware } from 'src/common/middleware/log.middleware';
 
 @Module({
   imports: [
@@ -40,4 +41,4 @@ import { PostsImagesService } from './image/images.service';
     // AccessTokenGuard,
   ],
 })
-export class PostsModule { }
+export class PostsModule {} 
