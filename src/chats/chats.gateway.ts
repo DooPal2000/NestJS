@@ -30,9 +30,13 @@ export class ChatsGateway implements OnGatewayConnection {
         @MessageBody() message: { message: string, chatId: number },
         @ConnectedSocket() socket: Socket,
     ) {
-        this.server.in(
-            message.chatId.toString()
-        ).emit('receive_message', message.message);
+        // 아래의 경우, broadCasting 이기 때문에, 자신 제외하고 메세지 전송
+        socket.to(message.chatId.toString()).emit("receive_message", message.message);
+
+        // 아래의 경우, 보낸 자신까지도 포함하여 메세지 전송
+        // this.server.in(
+        //     message.chatId.toString()
+        // ).emit('receive_message', message.message);
         // console.log(message);
     }
 }
