@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { RolesEnum } from "../const/roles.const";
 import { PostsModel } from "src/posts/entities/posts.entity";
 import { BaseModel } from "src/common/entity/base.entity";
@@ -7,6 +7,7 @@ import { lengthValidationMessage } from "src/common/validation-message/length-va
 import { stringValidationMessage } from "src/common/validation-message/string-validation.message";
 import { emailValidationMessage } from "src/common/validation-message/email-validation.message";
 import { Exclude } from "class-transformer";
+import { ChatsModel } from "src/chats/entity/chats.entity";
 
 @Entity()
 // @Exclude() // 보안이 매우 중요한 객체라면, entity 자체를 exclude 할 수도 있다. 그 이후에 expose() 를 활용하는 방식이다.
@@ -68,5 +69,9 @@ export class UsersModel extends BaseModel {
 
     @OneToMany(() => PostsModel, (post) => post.author)
     posts: PostsModel[];
+
+    @ManyToMany(()=>ChatsModel,(chat)=> chat.users)
+    @JoinTable()
+    chats: ChatsModel[];
 
 }
