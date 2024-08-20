@@ -24,8 +24,6 @@ export class ChatsGateway implements OnGatewayConnection {
         @MessageBody() data: CreateChatDto,
         @ConnectedSocket() socket: Socket,
     ) {
-        console.log('Received data:', data);  // 추가된 로그
-
         const chat = await this.chatsService.createChat(
             data,
         );
