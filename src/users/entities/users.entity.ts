@@ -8,6 +8,7 @@ import { stringValidationMessage } from "src/common/validation-message/string-va
 import { emailValidationMessage } from "src/common/validation-message/email-validation.message";
 import { Exclude } from "class-transformer";
 import { ChatsModel } from "src/chats/entity/chats.entity";
+import { MessagesModel } from "src/chats/messages/entity/messages.entity";
 
 @Entity()
 // @Exclude() // 보안이 매우 중요한 객체라면, entity 자체를 exclude 할 수도 있다. 그 이후에 expose() 를 활용하는 방식이다.
@@ -70,8 +71,13 @@ export class UsersModel extends BaseModel {
     @OneToMany(() => PostsModel, (post) => post.author)
     posts: PostsModel[];
 
-    @ManyToMany(()=>ChatsModel,(chat)=> chat.users)
+    @ManyToMany(() => ChatsModel, (chat) => chat.users)
     @JoinTable()
     chats: ChatsModel[];
+
+    @OneToMany(() => MessagesModel, (msg) => msg.author)
+    messages: MessagesModel;
+
+
 
 }
