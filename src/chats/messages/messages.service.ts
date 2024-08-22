@@ -13,6 +13,12 @@ export class ChatsMessagesService {
         private readonly commonService: CommonService,
     ) { }
 
+    createMessage(
+        
+    ){
+        
+    }
+
     paginateChats(
         dto: BasePaginationDto,
         overrideFindOptions: FindManyOptions<MessagesModel>,
