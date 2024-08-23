@@ -3,6 +3,8 @@ import { Server, Socket } from "socket.io";
 import { CreateChatDto } from "./dto/create-chat.dto";
 import { ChatsService } from "./chats.service";
 import { EnterChatDto } from "src/common/dto/enter-chat.dto";
+import { CreateMessageDto } from "./messages/dto/create-messages.dto";
+import { ChatsMessagesService } from "./messages/messages.service";
 
 @WebSocketGateway({
     // ws://localhost:3000/chats
@@ -11,6 +13,7 @@ import { EnterChatDto } from "src/common/dto/enter-chat.dto";
 export class ChatsGateway implements OnGatewayConnection {
     constructor(
         private readonly chatsService: ChatsService,
+        private readonly messagesService: ChatsMessagesService,
     ) { }
 
     @WebSocketServer()
@@ -59,12 +62,19 @@ export class ChatsGateway implements OnGatewayConnection {
 
     //socket.on('send_message',(msg) => { console.log(msg) });
     @SubscribeMessage('send_message')
-    sendMessage(
-        @MessageBody() message: { message: string, chatId: number },
+    async sendMessage(
+        @MessageBody() dto: CreateMessageDto,
         @ConnectedSocket() socket: Socket,
     ) {
+        const chatExists = await this.chatsService.checkIfChatExists(dto.chatId);
+        if (chatExists) {
+            throw new WsException(`존재하지 않는 채팅방입니다. Chat ID : ${dto.chatId}`);
+        }
+        const message = await this.messagesService.createMessage(
+            dto,
+        );
         // 아래의 경우, broadCasting 이기 때문에, 자신 제외하고 메세지 전송
-        socket.to(message.chatId.toString()).emit("receive_message", message.message);
+        socket.to(message.id.toString()).emit("receive_message", message.message);
 
         // 아래의 경우, 보낸 자신까지도 포함하여 메세지 전송
         // this.server.in(
