@@ -67,7 +67,7 @@ export class ChatsGateway implements OnGatewayConnection {
         @ConnectedSocket() socket: Socket,
     ) {
         const chatExists = await this.chatsService.checkIfChatExists(dto.chatId);
-        if (chatExists) {
+        if (!chatExists) {
             throw new WsException(`존재하지 않는 채팅방입니다. Chat ID : ${dto.chatId}`);
         }
         const message = await this.messagesService.createMessage(
