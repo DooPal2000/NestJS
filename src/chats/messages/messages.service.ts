@@ -30,11 +30,14 @@ export class ChatsMessagesService {
         return this.messageRepository.findOne({
             where: {
                 id: message.id,
+            },
+            relations: {
+                chat: true,
             }
         })
     }
 
-    paginateChats(
+    paginateMessages(
         dto: BasePaginationDto,
         overrideFindOptions: FindManyOptions<MessagesModel>,
     ) {
