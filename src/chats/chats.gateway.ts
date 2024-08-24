@@ -27,6 +27,7 @@ export class ChatsGateway implements OnGatewayConnection {
         console.log(`on connect called: ${socket.id}`);
     }
 
+    @SubscribeMessage('create_chat')
     @UsePipes(new ValidationPipe({
         transform: true,
         transformOptions: {
@@ -37,7 +38,6 @@ export class ChatsGateway implements OnGatewayConnection {
     }))
     @UseFilters(SocketCatchHttpExceptionFilter)
     @UseGuards(SocketBearerTokenGuard)
-    @SubscribeMessage('create_chat')
     async createChat(
         @MessageBody() data: CreateChatDto,
         @ConnectedSocket() socket: Socket & { user: UsersModel },
@@ -48,6 +48,16 @@ export class ChatsGateway implements OnGatewayConnection {
     }
 
     @SubscribeMessage('enter_chat')
+    @UsePipes(new ValidationPipe({
+        transform: true,
+        transformOptions: {
+            enableImplicitConversion: true,
+        },
+        whitelist: true,
+        forbidNonWhitelisted: true,
+    }))
+    @UseFilters(SocketCatchHttpExceptionFilter)
+    @UseGuards(SocketBearerTokenGuard)
     async enterChat(
         // 방의 ID들을 리스트로 받는다.
         @MessageBody() data: EnterChatDto,
@@ -76,9 +86,18 @@ export class ChatsGateway implements OnGatewayConnection {
 
     //socket.on('send_message',(msg) => { console.log(msg) });
     @SubscribeMessage('send_message')
+    @UsePipes(new ValidationPipe({
+        transform: true,
+        transformOptions: {
+            enableImplicitConversion: true,
+        },
+        whitelist: true,
+        forbidNonWhitelisted: true,
+    }))
+    @UseFilters(SocketCatchHttpExceptionFilter)
     async sendMessage(
         @MessageBody() dto: CreateMessageDto,
-        @ConnectedSocket() socket: Socket,
+        @ConnectedSocket() socket: Socket & {user: UsersModel},
     ) {
         const chatExists = await this.chatsService.checkIfChatExists(dto.chatId);
         if (!chatExists) {
@@ -86,6 +105,7 @@ export class ChatsGateway implements OnGatewayConnection {
         }
         const message = await this.messagesService.createMessage(
             dto,
+            socket.user.id,
         );
         // 아래의 경우, broadCasting 이기 때문에, 자신 제외하고 메세지 전송
         socket.to(message.chat.id.toString()).emit("receive_message", message.message);
