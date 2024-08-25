@@ -10,6 +10,7 @@ import { SocketCatchHttpExceptionFilter } from "src/common/exception-filter/sock
 import { SocketBearerTokenGuard } from "src/auth/guard/socket/socket-bearer-token.guard";
 import { UsersModel } from "src/users/entities/users.entity";
 import { UsersService } from "src/users/users.service";
+import { AuthService } from "src/auth/auth.service";
 
 @WebSocketGateway({
     // ws://localhost:3000/chats
@@ -19,7 +20,8 @@ export class ChatsGateway implements OnGatewayConnection {
     constructor(
         private readonly chatsService: ChatsService,
         private readonly messagesService: ChatsMessagesService,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
+        private readonly authService: AuthService,
     ) { }
 
     @WebSocketServer()
@@ -27,11 +29,34 @@ export class ChatsGateway implements OnGatewayConnection {
 
     async handleConnection(socket: Socket & { user: UsersModel }) {
         console.log(`on connect called: ${socket.id}`);
-        
-        // RestAPI 방식처럼 말고, 처음 소켓 연결되는 곳에서 socket.user 에 담아서 처리
-        const user = await this.usersService.getUserByEmail('sam1@naver.com');
 
-        socket.user = user;
+        const headers = socket.handshake.headers;
+
+        const rawToken = headers['authorization'];
+
+        if (!rawToken) {
+            socket.disconnect();
+        }
+
+        try {
+            const token = this.authService.extractTokenFromHeader(
+                rawToken,
+                true,
+            );
+
+            const payload = this.authService.verifyToken(token);
+            const user = await this.usersService.getUserByEmail(payload.email);
+
+            // RestApi 였으면  req 에 담을 텐데, 현재는 ws이기에 소켓에 담는다
+            socket.user = user;
+            // socket.token = token;
+            // socket.tokenType = payload.tokenType;
+
+            return true;
+        } catch (e) {
+            socket.disconnect();
+        }
+
     }
 
     @SubscribeMessage('create_chat')

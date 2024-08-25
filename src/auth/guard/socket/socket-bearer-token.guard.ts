@@ -11,6 +11,7 @@ export class SocketBearerTokenGuard implements CanActivate {
         private readonly usersService: UsersService,
     ) { }
     async canActivate(context: ExecutionContext): Promise<boolean> {
+        // socket에 사용자 정보 저장하기, 챕터 이후 아래 코드는 사용하지 않음, gateway로 이전
         const socket = context.switchToWs().getClient();
 
         const headers = socket.handshake.headers;
@@ -39,7 +40,6 @@ export class SocketBearerTokenGuard implements CanActivate {
         } catch (e) {
             throw new WsException('토큰이 유효하지 않습니다.');
         }
-
 
     }
 
