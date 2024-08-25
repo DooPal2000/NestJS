@@ -9,6 +9,7 @@ import { UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
 import { SocketCatchHttpExceptionFilter } from "src/common/exception-filter/socket-catch-http.exception-filter";
 import { SocketBearerTokenGuard } from "src/auth/guard/socket/socket-bearer-token.guard";
 import { UsersModel } from "src/users/entities/users.entity";
+import { UsersService } from "src/users/users.service";
 
 @WebSocketGateway({
     // ws://localhost:3000/chats
@@ -18,13 +19,19 @@ export class ChatsGateway implements OnGatewayConnection {
     constructor(
         private readonly chatsService: ChatsService,
         private readonly messagesService: ChatsMessagesService,
+        private readonly usersService: UsersService
     ) { }
 
     @WebSocketServer()
     server: Server;
 
-    handleConnection(socket: Socket) {
+    async handleConnection(socket: Socket & { user: UsersModel }) {
         console.log(`on connect called: ${socket.id}`);
+        
+        // RestAPI 방식처럼 말고, 처음 소켓 연결되는 곳에서 socket.user 에 담아서 처리
+        const user = await this.usersService.getUserByEmail('sam1@naver.com');
+
+        socket.user = user;
     }
 
     @SubscribeMessage('create_chat')
@@ -37,7 +44,6 @@ export class ChatsGateway implements OnGatewayConnection {
         forbidNonWhitelisted: true,
     }))
     @UseFilters(SocketCatchHttpExceptionFilter)
-    @UseGuards(SocketBearerTokenGuard)
     async createChat(
         @MessageBody() data: CreateChatDto,
         @ConnectedSocket() socket: Socket & { user: UsersModel },
@@ -57,11 +63,10 @@ export class ChatsGateway implements OnGatewayConnection {
         forbidNonWhitelisted: true,
     }))
     @UseFilters(SocketCatchHttpExceptionFilter)
-    @UseGuards(SocketBearerTokenGuard)
     async enterChat(
         // 방의 ID들을 리스트로 받는다.
+        @ConnectedSocket() socket: Socket & { user: UsersModel },
         @MessageBody() data: EnterChatDto,
-        @ConnectedSocket() socket: Socket,
     ) {
         for (const chatId of data.chatIds) {
             const exists = await this.chatsService.checkIfChatExists(
@@ -97,7 +102,7 @@ export class ChatsGateway implements OnGatewayConnection {
     @UseFilters(SocketCatchHttpExceptionFilter)
     async sendMessage(
         @MessageBody() dto: CreateMessageDto,
-        @ConnectedSocket() socket: Socket & {user: UsersModel},
+        @ConnectedSocket() socket: Socket & { user: UsersModel },
     ) {
         const chatExists = await this.chatsService.checkIfChatExists(dto.chatId);
         if (!chatExists) {
