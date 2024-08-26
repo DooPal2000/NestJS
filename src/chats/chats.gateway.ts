@@ -1,4 +1,4 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from "@nestjs/websockets";
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { CreateChatDto } from "./dto/create-chat.dto";
 import { ChatsService } from "./chats.service";
@@ -16,7 +16,7 @@ import { AuthService } from "src/auth/auth.service";
     // ws://localhost:3000/chats
     namespace: 'chats'
 })
-export class ChatsGateway implements OnGatewayConnection {
+export class ChatsGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
     constructor(
         private readonly chatsService: ChatsService,
         private readonly messagesService: ChatsMessagesService,
@@ -26,6 +26,14 @@ export class ChatsGateway implements OnGatewayConnection {
 
     @WebSocketServer()
     server: Server;
+
+    afterInit(server: any) {
+        console.log(`after gateway init`);
+    }
+
+    handleDisconnect(socket: Socket & { user: UsersModel }) {
+        console.log(`on disconnect called : ${socket.id}`);
+    }
 
     async handleConnection(socket: Socket & { user: UsersModel }) {
         console.log(`on connect called: ${socket.id}`);
