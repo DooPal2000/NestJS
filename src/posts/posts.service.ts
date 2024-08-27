@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, LessThan, MoreThan, QueryRunner, Repository } from 'typeorm';
-import { PostsModel } from './entities/posts.entity';
-import { UsersModel } from 'src/users/entities/users.entity';
+import { PostsModel } from './entity/posts.entity';
+import { UsersModel } from 'src/users/entity/users.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';

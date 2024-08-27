@@ -8,7 +8,7 @@ import { ChatsMessagesService } from "./messages/messages.service";
 import { UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { SocketCatchHttpExceptionFilter } from "src/common/exception-filter/socket-catch-http.exception-filter";
 import { SocketBearerTokenGuard } from "src/auth/guard/socket/socket-bearer-token.guard";
-import { UsersModel } from "src/users/entities/users.entity";
+import { UsersModel } from "src/users/entity/users.entity";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "src/auth/auth.service";
 
