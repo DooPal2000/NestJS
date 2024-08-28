@@ -19,6 +19,7 @@ import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from './chats/entity/chats.entity';
 import { MessagesModel } from './chats/messages/entity/messages.entity';
 import { CommentsModule } from './posts/comments/comments.module';
+import { CommentsModel } from './posts/comments/entity/comments.entity';
 
 @Module({
   imports: [
@@ -45,8 +46,9 @@ import { CommentsModule } from './posts/comments/comments.module';
         ImageModel,
         ChatsModel,
         MessagesModel,
+        CommentsModel,
       ],
-      synchronize: true,
+      synchronize: false,
     }),
     UsersModule,
     AuthModule,

@@ -9,6 +9,7 @@ import { emailValidationMessage } from "src/common/validation-message/email-vali
 import { Exclude } from "class-transformer";
 import { ChatsModel } from "src/chats/entity/chats.entity";
 import { MessagesModel } from "src/chats/messages/entity/messages.entity";
+import { CommentsModel } from "src/posts/comments/entity/comments.entity";
 
 @Entity()
 // @Exclude() // 보안이 매우 중요한 객체라면, entity 자체를 exclude 할 수도 있다. 그 이후에 expose() 를 활용하는 방식이다.
@@ -78,6 +79,6 @@ export class UsersModel extends BaseModel {
     @OneToMany(() => MessagesModel, (msg) => msg.author)
     messages: MessagesModel;
 
-
-
+    @OneToMany(() => CommentsModel, (comment) => comment.author)
+    postComments: CommentsModel[];
 }

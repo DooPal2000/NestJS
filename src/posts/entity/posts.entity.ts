@@ -7,6 +7,7 @@ import { ImageModel } from "src/common/entity/image.entity";
 import { stringValidationMessage } from "src/common/validation-message/string-validation.message";
 import { UsersModel } from "src/users/entity/users.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { CommentsModel } from "../comments/entity/comments.entity";
 
 @Entity()
 export class PostsModel extends BaseModel {
@@ -41,6 +42,9 @@ export class PostsModel extends BaseModel {
     @Column()
     commentCount: number;
 
-    @OneToMany((type) => ImageModel, (image) => image.post)
+    @OneToMany(() => ImageModel, (image) => image.post)
     images: ImageModel[];
+
+    @OneToMany(() => CommentsModel, (comment) => comment.post)
+    comments: CommentsModel[];
 }
