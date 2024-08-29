@@ -48,7 +48,7 @@ import { CommentsModel } from './posts/comments/entity/comments.entity';
         MessagesModel,
         CommentsModel,
       ],
-      synchronize: false,
+      synchronize: true,
     }),
     UsersModule,
     AuthModule,
