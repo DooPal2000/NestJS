@@ -3,6 +3,7 @@ import { CommentsService } from './comments.service';
 import { CommentsController } from './comments.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentsModel } from './entity/comments.entity';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   // 아래 import: TypeOrmModule 작성 후 Comment 리포지토리 사용 가능 (꼭 기억)
@@ -10,6 +11,7 @@ import { CommentsModel } from './entity/comments.entity';
     TypeOrmModule.forFeature([
       CommentsModel,
     ]),
+    CommonModule,
   ],
   controllers: [CommentsController],
   providers: [CommentsService],
