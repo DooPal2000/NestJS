@@ -49,10 +49,10 @@ export class CommentsController {
   @Post()
   @UseGuards(AccessTokenGuard)
   postComment(
-    @Param('pid', ParseIntPipe) pid: number,
+    @Param('postId', ParseIntPipe) postId: number,
     @Body() body: CreateCommentsDto,
     @User() user: UsersModel,
   ) {
-    return this.commentsService.createComment(body, pid, user);
+    return this.commentsService.createComment(body, postId, user);
   }
 }
