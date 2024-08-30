@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommonService } from 'src/common/common.service';
-import { PaginateCommentsDto } from './dto/paginate-post.dto';
+import { PaginateCommentsDto } from './dto/paginate-comments.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentsModel } from './entity/comments.entity';
 import { Repository } from 'typeorm';
 import { CreateCommentsDto } from './dto/create-comments.dto';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { DEFAULT_COMMENT_FIND_OPTIONS } from './const/default-comment-find-options.const';
+import { UpdateCommentsDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -55,12 +56,31 @@ export class CommentsService {
         postId: number,
         author: UsersModel,
     ) {
-        return this.commentsRepository.save({
+        const newComment = await this.commentsRepository.save({
             ...dto,
             post: {
                 id: postId,
             },
             author,
         });
+
+        return newComment;
     }
+
+    async updateComment(
+        dto: UpdateCommentsDto,
+        commentId: number,
+    ) {
+        const prevComment = await this.commentsRepository.preload({
+            id: commentId,
+            ...dto,
+        });
+
+        const newComment = this.commentsRepository.save(
+            prevComment,
+        );
+
+        return newComment;
+    }
+
 }

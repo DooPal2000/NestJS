@@ -105,6 +105,6 @@ export class PostsController {
   deletePost(
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.postsService.deletePost(+id);
+    return this.postsService.deletePost(id);
   }
 }
