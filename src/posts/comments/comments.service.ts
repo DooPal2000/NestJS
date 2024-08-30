@@ -4,6 +4,8 @@ import { PaginateCommentsDto } from './dto/paginate-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentsModel } from './entity/comments.entity';
 import { Repository } from 'typeorm';
+import { CreateCommentsDto } from './dto/create-comments.dto';
+import { UsersModel } from 'src/users/entity/users.entity';
 
 @Injectable()
 export class CommentsService {
@@ -43,5 +45,13 @@ export class CommentsService {
             )
         }
         return comment;
+    }
+
+    async createComment(
+        dto: CreateCommentsDto,
+        postId: number,
+        author: UsersModel,
+    ){
+
     }
 }
