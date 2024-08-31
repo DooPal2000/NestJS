@@ -83,4 +83,21 @@ export class CommentsService {
         return newComment;
     }
 
+    async deleteComment(
+        commentId: number,
+    ) {
+        const comment = await this.commentsRepository.findOne({
+            where: {
+                id: commentId,
+            }
+        })
+        if (!comment) {
+            throw new BadRequestException(
+                `존재하지 않는 댓글입니다.`
+            )
+        }
+        await this.commentsRepository.delete(commentId);
+
+        return commentId;
+    }
 }
