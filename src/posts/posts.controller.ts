@@ -16,6 +16,7 @@ import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { HttpExceptionFilter } from 'src/common/exception-filter/http.exception-filter';
 import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const/roles.const';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
 
 /**
 * author :string;
@@ -36,6 +37,7 @@ export class PostsController {
   ) { }
 
   @Get()
+  @IsPublic()
   // @UseInterceptors(LogInterceptor)
   getPosts(
     @Query() query: PaginatePostDto,
@@ -104,7 +106,6 @@ export class PostsController {
   }
 
   @Delete(':id')
-  @UseGuards(AccessTokenGuard)
   @Roles(RolesEnum.ADMIN)
   deletePost(
     @Param('id', ParseIntPipe) id: number,
