@@ -47,16 +47,15 @@ export class PostsController {
   }
 
 
-  // POST /posts/random
-  // @Post('random')
-  // @UseGuards(AccessTokenGuard)
-  // async postPostsRandom(@User() user: UsersModel){
-  //   await this.postsService.generatePosts(user.id);
+  @Post('random')
+  async postPostsRandom(@User() user: UsersModel){
+    await this.postsService.generatePosts(user.id);
 
-  //   return true;
-  // }
+    return true;
+  }
 
   @Get(':id')
+  @IsPublic()
   getPost(@Param('id', ParseIntPipe) id: number) { // param 데코레이터에 파라미터 이름이 id이다. 
     return this.postsService.getPostById(id);
   }
@@ -67,7 +66,6 @@ export class PostsController {
    * start, commit, rollback
    */
   @Post()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(TransactionInterceptor)
   async postPosts(
     // @Request() req:any,
