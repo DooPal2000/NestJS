@@ -238,4 +238,12 @@ export class PostsService {
         await this.postsRepository.delete(postId);
         return postId;
     }
+
+    checkPostExistsById(id: number) {
+        return this.postsRepository.exists({
+            where: {
+                id,
+            }
+        });
+    }
 }
