@@ -40,5 +40,6 @@ import { LogMiddleware } from 'src/common/middleware/log.middleware';
     // UsersService,
     // AccessTokenGuard,
   ],
+  exports: [PostsService],
 })
-export class PostsModule {} 
+export class PostsModule { } 
