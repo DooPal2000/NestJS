@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, LessThan, MoreThan, QueryRunner, Repository } from 'typeorm';
+import { FindOptionsWhere, LessThan, MoreThan, QueryRunner, Repository, TreeLevelColumn } from 'typeorm';
 import { PostsModel } from './entity/posts.entity';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -239,11 +239,25 @@ export class PostsService {
         return postId;
     }
 
-    checkPostExistsById(id: number) {
+    async checkPostExistsById(id: number) {
         return this.postsRepository.exists({
             where: {
                 id,
             }
         });
+    }
+
+    async isPostMine(userId: number, postId: number) {
+        return this.postsRepository.exists({
+            where: {
+                id: postId,
+                author: {
+                    id: userId,
+                },
+            },
+            relations: {
+                author: true,
+            }
+        })
     }
 }
