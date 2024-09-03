@@ -1,4 +1,4 @@
-import { BadRequestException, CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { RolesEnum } from "src/users/const/roles.const";
 import { PostsService } from "../posts.service";
@@ -16,6 +16,9 @@ export class IsPostMineOrAdmin implements CanActivate {
 
         const { user } = req;
 
+        console.log('Authenticated user:', user);
+
+        
         if (!user) {
             throw new UnauthorizedException(
                 `사용자 정보를 가져올 수 없습니다.`)
@@ -33,9 +36,22 @@ export class IsPostMineOrAdmin implements CanActivate {
             )
         }
 
-        return this.postsService.isPostMine(
+        const isOk = await this.postsService.isPostMine(
             user.id,
             parseInt(postId)
-        )
+        );
+
+
+        if (!isOk) {
+            throw new ForbiddenException(
+                `권한이 없습니다.`
+            )
+        }
+        console.log('Post ID:', postId);
+        console.log('User:', user);
+        console.log('Is Post Mine:', isOk);
+
+
+        return true;
     }
 }

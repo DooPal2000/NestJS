@@ -151,6 +151,8 @@ export class AuthService {
             type: isRefreshToken ? 'refresh' : 'access',
         };
 
+        console.log('Signing token for user:', user.email, 'with payload:', payload);
+
         return this.jwtService.sign(payload, {
             secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
             // seconds
@@ -158,6 +160,8 @@ export class AuthService {
         });
     }
     loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
+        console.log('Login user:', user.email, user.id);
+
         return {
             accessToken: this.signToken(user, false),
             refreshToken: this.signToken(user, true),
@@ -188,6 +192,8 @@ export class AuthService {
         if (!passOk) {
             throw new UnauthorizedException('비밀번호가 틀렸습니다.');
         }
+        console.log('User authenticated:', existingUser);
+
         return existingUser;
     }
 

@@ -46,8 +46,8 @@ export class BearerTokenGuard implements CanActivate {
          * 2) token - token
          * 3) tokenType - access | refresh
          */
-        const user = await this.usersService.getUserByEmail(result.eamil);
-
+        const user = await this.usersService.getUserByEmail(result.email);
+        // 여기서 email eamil 철자 하나 틀려서 작동을 하지 않았음 (20240904 00시)
         req.user = user;
         req.token = token;
         req.tokenType = result.type;
