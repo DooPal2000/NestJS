@@ -1,14 +1,14 @@
 import { BadRequestException, CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { RolesEnum } from "src/users/const/roles.const";
-import { PostsService } from "../posts.service";
 import { Request } from "express";
 import { UsersModel } from "src/users/entity/users.entity";
+import { CommentsService } from "../comments.service";
 
 @Injectable()
-export class IsPostMineOrAdminGuard implements CanActivate {
+export class IsCommentMineOrAdminGuard implements CanActivate {
     constructor(
-        private readonly postsService: PostsService,
+        private readonly commentsService: CommentsService,
     ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -16,6 +16,7 @@ export class IsPostMineOrAdminGuard implements CanActivate {
 
         const { user } = req;
 
+        console.log('Authenticated user:', user);
 
         
         if (!user) {
@@ -27,17 +28,17 @@ export class IsPostMineOrAdminGuard implements CanActivate {
             return true;
         }
 
-        const postId = req.params.postId;
+        const commentId = req.params.commentId;
 
-        if (!postId) {
+        if (!commentId) {
             throw new BadRequestException(
                 `Post ID가 파라미터로 제공돼야합니다.`
             )
         }
 
-        const isOk = await this.postsService.isPostMine(
+        const isOk = await this.commentsService.isCommentMine(
             user.id,
-            parseInt(postId)
+            parseInt(commentId)
         );
 
 

@@ -17,7 +17,7 @@ import { HttpExceptionFilter } from 'src/common/exception-filter/http.exception-
 import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const/roles.const';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
-import { IsPostMineOrAdmin } from './guard/is-post-mine-or-admin.guard';
+import { IsPostMineOrAdminGuard } from './guard/is-post-mine-or-admin.guard';
 
 /**
 * author :string;
@@ -93,7 +93,7 @@ export class PostsController {
   }
 
   @Patch(':postId') // ? 를 붙임으로써 선택사항으로 남길 수 있다(null 허용)
-  @UseGuards(IsPostMineOrAdmin)
+  @UseGuards(IsPostMineOrAdminGuard)
   patchPost(
     @Param('postId', ParseIntPipe) id: number,
     @Body() body: UpdatePostDto,
