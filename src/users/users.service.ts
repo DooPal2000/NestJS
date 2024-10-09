@@ -15,20 +15,20 @@ export class UsersService {
         // 2) exist() -> 조건에 해당하는 값 있으면 true 반환
 
         const nicknameExists = await this.usersRepository.exists({
-            where:{
+            where: {
                 nickname: user.nickname,
             }
-        })        
-        if(nicknameExists){
+        })
+        if (nicknameExists) {
             throw new BadRequestException('이미 존재하는 닉네임입니다.');
         }
-        
+
         const emailExists = await this.usersRepository.exists({
-            where:{
+            where: {
                 email: user.email,
             }
         })
-        if(emailExists){
+        if (emailExists) {
             throw new BadRequestException('이미 가입한 이메일입니다.');
         }
 
@@ -53,5 +53,45 @@ export class UsersService {
                 email,
             }
         })
+    }
+
+    async followUser(followerId: number, followeeId: number) {
+        const user = await this.usersRepository.findOne({
+            where: {
+                id: followerId
+            },
+            relations: {
+                followees: true,
+            },
+        });
+
+        if (!user) {
+            throw new BadRequestException(
+                `존재하지 않는 팔로워입니다.`
+            );
+        }
+
+        await this.usersRepository.save({
+            ...user,
+            followees: [
+                ...user.followees,
+                {
+                    id: followeeId,
+                }
+            ]
+        })
+    }
+
+    async getFollowers(userId: number) : Promise<UsersModel[]> {
+        const user = await this.usersRepository.findOne({
+            where: {
+                id: userId,
+            },
+            relations: {
+                followers: true,
+            }
+        });
+
+        return user.followers;
     }
 }
