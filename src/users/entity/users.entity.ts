@@ -10,6 +10,7 @@ import { Exclude } from "class-transformer";
 import { ChatsModel } from "src/chats/entity/chats.entity";
 import { MessagesModel } from "src/chats/messages/entity/messages.entity";
 import { CommentsModel } from "src/posts/comments/entity/comments.entity";
+import { UserFollowersModel } from "./user-followers.entity";
 
 @Entity()
 // @Exclude() // 보안이 매우 중요한 객체라면, entity 자체를 exclude 할 수도 있다. 그 이후에 expose() 를 활용하는 방식이다.
@@ -83,11 +84,10 @@ export class UsersModel extends BaseModel {
     postComments: CommentsModel[];
 
     // 내가 팔로우 하고 있는 사람
-    @ManyToMany(() => UsersModel, (user) => user.followees)
-    @JoinTable()
+    @OneToMany(() => UserFollowersModel, (ufm) => ufm.follower)
     followers: UsersModel[];
 
     // 나를 팔로우 하고 있는 사람들
-    @ManyToMany(() => UsersModel, (user) => user.followers)
+    @OneToMany(() => UserFollowersModel, (ufm) => ufm.followee)
     followees: UsersModel[];
 }
