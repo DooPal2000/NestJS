@@ -2,12 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersModel } from './entity/users.entity';
 import { Repository } from 'typeorm';
+import { UserFollowersModel } from './entity/user-followers.entity';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(UsersModel)
         private readonly usersRepository: Repository<UsersModel>,
+        @InjectRepository(UserFollowersModel)
+        private readonly userFollowersRepository: Repository<UserFollowersModel>,
     ) { }
 
     async createUser(user: Pick<UsersModel, 'email' | 'nickname' | 'password'>) {
@@ -56,42 +59,67 @@ export class UsersService {
     }
 
     async followUser(followerId: number, followeeId: number) {
-        const user = await this.usersRepository.findOne({
-            where: {
-                id: followerId
-            },
-            relations: {
-                followees: true,
-            },
-        });
 
-        if (!user) {
-            throw new BadRequestException(
-                `존재하지 않는 팔로워입니다.`
-            );
-        }
-
-        await this.usersRepository.save({
-            ...user,
-            followees: [
-                ...user.followees,
-                {
-                    id: followeeId,
-                }
-            ]
-        })
-    }
-
-    async getFollowers(userId: number) : Promise<UsersModel[]> {
-        const user = await this.usersRepository.findOne({
-            where: {
-                id: userId,
+        const result = await this.userFollowersRepository.save({
+            follower: {
+                id: followerId,
             },
-            relations: {
-                followers: true,
+            followee: {
+                id: followeeId,
             }
         });
 
-        return user.followers;
+        return true;
+
+
+        // const user = await this.usersRepository.findOne({
+        //     where: {
+        //         id: followerId
+        //     },
+        //     relations: {
+        //         followees: true,
+        //     },
+        // });
+
+        // if (!user) {
+        //     throw new BadRequestException(
+        //         `존재하지 않는 팔로워입니다.`
+        //     );
+        // }
+
+        // await this.usersRepository.save({
+        //     ...user,
+        //     followees: [
+        //         ...user.followees,
+        //         {
+        //             id: followeeId,
+        //         }
+        //     ]
+        // })
+    }
+
+    async getFollowers(userId: number): Promise<UsersModel[]> {
+        const result = await this.userFollowersRepository.find({
+            where: {
+                followee: {
+                    id: userId,
+                }
+            },
+            relations: {
+                follower: true,
+                followee: true,
+            }
+        })
+
+        // const user = await this.usersRepository.findOne({
+        //     where: {
+        //         id: userId,
+        //     },
+        //     relations: {
+        //         followers: true,
+        //     }
+        // });
+
+        return result.map((x) => x.follower);
     }
 }
