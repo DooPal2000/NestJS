@@ -164,4 +164,28 @@ export class UsersService {
 
         return true;
     }
+
+    async deleteFollow(followerId: number, followeeId: number) {
+        const existing = await this.userFollowersRepository.delete({
+            follower: {
+                id: followerId,
+            },
+            followee: {
+                id: followeeId,
+            }
+        });
+
+        if (!existing) {
+            throw new BadRequestException(
+                `유효하지 않은 팔로우 요청입니다.`,
+            );
+        }
+
+        // await this.userFollowersRepository.save({
+        //     ...existing,
+        //     isConfirmed: false,
+        // });
+
+        return true;
+    }
 }
