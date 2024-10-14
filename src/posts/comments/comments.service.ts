@@ -3,11 +3,12 @@ import { CommonService } from 'src/common/common.service';
 import { PaginateCommentsDto } from './dto/paginate-comments.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentsModel } from './entity/comments.entity';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { CreateCommentsDto } from './dto/create-comments.dto';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { DEFAULT_COMMENT_FIND_OPTIONS } from './const/default-comment-find-options.const';
 import { UpdateCommentsDto } from './dto/update-comment.dto';
+// import {  } from 'src/common/decorator/query-runner.decorator';
 
 @Injectable()
 export class CommentsService {
@@ -16,6 +17,10 @@ export class CommentsService {
         private readonly commentsRepository: Repository<CommentsModel>,
         private readonly commonService: CommonService
     ) { }
+
+    getRepository(qr?: QueryRunner) {
+        return qr ? qr.manager.getRepository<CommentsModel>(CommentsModel) : this.commentsRepository;
+    }
 
     paginateComments(
         dto: PaginateCommentsDto,
@@ -55,16 +60,16 @@ export class CommentsService {
         dto: CreateCommentsDto,
         postId: number,
         author: UsersModel,
+        qr?: QueryRunner
     ) {
-        const newComment = await this.commentsRepository.save({
+        const repository = this.getRepository(qr);
+        return await repository.save({
             ...dto,
             post: {
                 id: postId,
             },
             author,
         });
-
-        return newComment;
     }
 
     async updateComment(
@@ -85,8 +90,11 @@ export class CommentsService {
 
     async deleteComment(
         commentId: number,
+        qr?: QueryRunner
     ) {
-        const comment = await this.commentsRepository.findOne({
+        const repository = this.getRepository(qr);
+
+        const comment = await repository.findOne({
             where: {
                 id: commentId,
             }
@@ -96,7 +104,7 @@ export class CommentsService {
                 `존재하지 않는 댓글입니다.`
             )
         }
-        await this.commentsRepository.delete(commentId);
+        await repository.delete(commentId);
 
         return commentId;
     }

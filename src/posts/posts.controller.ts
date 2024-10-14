@@ -87,8 +87,6 @@ export class PostsController {
         type: ImageModelType.POST_IMAGE,
       }, qr);
     }
-
-    await qr.commitTransaction();
     return this.postsService.getPostById(post.id, qr);
   }
 
@@ -107,10 +105,12 @@ export class PostsController {
 
   @Delete(':id')
   @Roles(RolesEnum.ADMIN)
-  deletePost(
+  async deletePost(
     @Param('id', ParseIntPipe) id: number,
+    @QueryRunner() qr: QR,
   ) {
-    return this.postsService.deletePost(id);
+    await this.postsService.deletePost(id);
+
   }
 
   // RBAC -> Role Based Access Control

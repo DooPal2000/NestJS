@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { PaginateCommentsDto } from './dto/paginate-comments.dto';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
@@ -8,10 +8,16 @@ import { User } from 'src/users/decorator/user.decorator';
 import { UpdateCommentsDto } from './dto/update-comment.dto';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
 import { IsCommentMineOrAdminGuard } from './guard/is-comment-mine-or-admin.guard';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
+import { QueryRunner as QR } from 'typeorm';
+import { PostsService } from '../posts.service';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) { }
+  constructor(private readonly commentsService: CommentsService,
+    private readonly postsService: PostsService,
+  ) { }
 
   /**
    * 1. Entity 생성
@@ -52,12 +58,25 @@ export class CommentsController {
   }
 
   @Post()
-  postComment(
+  @UseInterceptors(TransactionInterceptor)
+  async postComment(
     @Param('postId', ParseIntPipe) postId: number,
     @Body() body: CreateCommentsDto,
     @User() user: UsersModel,
+    @QueryRunner() qr: QR,
   ) {
-    return this.commentsService.createComment(body, postId, user);
+    const res = await this.commentsService.createComment(
+      body,
+      postId,
+      user,
+      qr,
+    );
+    await this.postsService.incrementCommentCount(
+      postId,
+      qr,
+    )
+
+    return res;
   }
 
   @Patch(':commentId')
@@ -76,12 +95,18 @@ export class CommentsController {
 
   @Delete(':commentId')
   @UseGuards(IsCommentMineOrAdminGuard)
+  @UseInterceptors(TransactionInterceptor)
   async deleteComment(
     @Param('commentId', ParseIntPipe) commentId: number,
-    @Body() body: UpdateCommentsDto,
+    @Param('postId', ParseIntPipe) postId: number,
+    @QueryRunner() qr: QR,
     // @Body('title') title?: string,
     // @Body('content') content?: string,
   ) {
-    return this.commentsService.deleteComment(commentId);
+    const res = await this.commentsService.deleteComment(commentId);
+
+    await this.postsService.decrementCommentCount(postId, qr);
+
+    return res;
   }
 }
