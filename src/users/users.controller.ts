@@ -54,6 +54,9 @@ export class UsersController {
 
     await this.usersService.incrementFollowerCount(user.id, qr);
 
+    // 팔로이 수 증가 (새로 추가)
+    await this.usersService.incrementFolloweeCount(followerId, qr);
+
     return true;
   }
 
@@ -68,6 +71,9 @@ export class UsersController {
     await this.usersService.deleteFollow(user.id, followeeId, qr);
 
     await this.usersService.decrementFollowerCount(user.id, qr);
+
+    // 팔로이 수 감소 (새로 추가)
+    await this.usersService.decrementFolloweeCount(user.id, qr);
 
     return true;
   }

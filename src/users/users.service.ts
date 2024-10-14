@@ -207,11 +207,27 @@ export class UsersService {
         }, 'followerCount', 1)
     }
 
+    async incrementFolloweeCount(userId: number, qr?: QueryRunner) {
+        const userRepository = this.getUsersRepository(qr);
+        await userRepository.increment({
+            id: userId,
+        }, 'followeeCount', 1)
+    }
+
     async decrementFollowerCount(userId: number, qr?: QueryRunner) {
         const userRepository = this.getUsersRepository(qr);
         await userRepository.decrement({
             id: userId,
         }, 'followerCount', 1)
     }
+
+    async decrementFolloweeCount(userId: number, qr?: QueryRunner) {
+        const userRepository = this.getUsersRepository(qr);
+        await userRepository.decrement({
+            id: userId,
+        }, 'followeeCount', 1)
+    }
+
+
 
 }
